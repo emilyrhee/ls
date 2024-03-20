@@ -9,25 +9,28 @@ struct Option {
     char a, s, r;
 };
 
-void do_ls(char* dir_name) {
-    DIR* dir_ptr;
+void print_dir(DIR* dir_ptr) {
     struct dirent* dirent_ptr;
-    dir_ptr = opendir(dir_name);
 
-    if(dir_ptr == 0) {
+    dirent_ptr = readdir(dir_ptr);
+
+    while (dirent_ptr != 0) {
+        printf("%s\n", dirent_ptr->d_name);
+        dirent_ptr = readdir(dir_ptr);
+    }
+}
+
+void do_ls(char* dir_name, struct Option option) {
+    DIR* dir_ptr = opendir(dir_name);
+
+    if (dir_ptr == 0) {
         perror(dir_name);
     } else {
-        dirent_ptr = readdir(dir_ptr);
-
-        while(dirent_ptr != 0) {
-            printf("%s\n", dirent_ptr->d_name);
-
-            dirent_ptr = readdir(dir_ptr);
-        }
-
+        print_dir(dir_ptr);
         closedir(dir_ptr);
     }
 }
+
 
 void parse_options(
     int argc,
@@ -70,7 +73,7 @@ int main(int argc, char* argv[]) {
         dir_name = argv[optind];
     }
     
-    do_ls(dir_name);
+    do_ls(dir_name, option);
 
     return 0;
 }
