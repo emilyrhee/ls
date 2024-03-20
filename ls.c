@@ -1,5 +1,13 @@
 #include <stdio.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <bits/getopt_core.h>
+
+const char* option_string = "asr";
+
+struct Option {
+    char a, s, r;
+};
 
 void do_ls(char* dir_name) {
     DIR* dir_ptr;
@@ -21,12 +29,48 @@ void do_ls(char* dir_name) {
     }
 }
 
-int main(int argc, char* argv[]) {
-    if (argc == 1) {
-        do_ls(".");
-    } else {
-        do_ls(argv[1]);
+void parse_options(
+    int argc,
+    char* argv[],
+    int* options,
+    struct Option* option
+) {
+    while (*options != -1) {
+        switch (*options) {
+            case 'a':
+                option->a = 1;
+                break;
+            case 's':
+                option->s = 1;
+                break;
+            case 'r':
+                option->r = 1;
+                break;
+            default:
+                printf(
+                    "?? getopt returned character code 0%o ??\n",
+                    *options
+                );
+        }
+
+        *options = getopt(argc, argv, option_string);
     }
+}
+
+int main(int argc, char* argv[]) {
+    struct Option option = { 0 };
+    int options = getopt(argc, argv, option_string);
+    char* dir_name;
+
+    parse_options(argc, argv, &options, &option);
+
+    if (optind >= argc) {
+        dir_name = ".";
+    } else {
+        dir_name = argv[optind];
+    }
+    
+    do_ls(dir_name);
 
     return 0;
 }
