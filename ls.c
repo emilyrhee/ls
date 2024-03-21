@@ -2,19 +2,20 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <bits/getopt_core.h>
+#include <string.h>
 
 const char* option_string = "asr";
+const int MAX_NAME_LENGTH = 256;
+const int MAX_DIR_ENTS = 500;
 
 struct Option {
     char a, s, r;
 };
 
-void print_dir(DIR* dir_ptr) {
-
-}
-
 void do_ls(char* dir_name, struct Option option) {
     DIR* dir_ptr = opendir(dir_name);
+    char dir_ents[MAX_DIR_ENTS][MAX_NAME_LENGTH];
+    int current_ent = 0;
 
     if (dir_ptr == 0) {
         perror(dir_name);
@@ -24,12 +25,24 @@ void do_ls(char* dir_name, struct Option option) {
 
         while (dirent_ptr != 0) {
             if (option.a || dirent_ptr->d_name[0] != '.') {
-                printf("%s\n", dirent_ptr->d_name);
+                strncpy(
+                    dir_ents[current_ent], 
+                    dirent_ptr->d_name, 
+                    MAX_NAME_LENGTH - 1
+                );
+                
+                dir_ents[current_ent][MAX_NAME_LENGTH - 1] = '\0';
+
+                current_ent++;
             }
 
             dirent_ptr = readdir(dir_ptr);
         }
         closedir(dir_ptr);
+
+        for (int i = 0; i < current_ent; i++) {
+            printf("%s\n", dir_ents[i]);
+        }
     }
 }
 
