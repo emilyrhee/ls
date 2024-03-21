@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <bits/getopt_core.h>
 #include <string.h>
+#include <stdlib.h>
 
 const char* option_string = "asr";
 const int MAX_NAME_LENGTH = 256;
@@ -11,6 +12,13 @@ const int MAX_DIR_ENTS = 500;
 struct Option {
     char a, s, r;
 };
+
+int cmpstr(void const *a, void const *b) { 
+    char const *aa = (char const *)a;
+    char const *bb = (char const *)b;
+
+    return strcmp(aa, bb);
+}
 
 void do_ls(char* dir_name, struct Option option) {
     DIR* dir_ptr = opendir(dir_name);
@@ -39,6 +47,9 @@ void do_ls(char* dir_name, struct Option option) {
             dirent_ptr = readdir(dir_ptr);
         }
         closedir(dir_ptr);
+
+        if (option.s)
+            qsort(dir_ents, current_ent, sizeof(dir_ents[0]), cmpstr);
 
         for (int i = 0; i < current_ent; i++) {
             printf("%s\n", dir_ents[i]);
