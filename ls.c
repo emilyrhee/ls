@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <dirent.h>
-#include <unistd.h>
-#include <bits/getopt_core.h>
+#include <getopt.h>
 #include <string.h>
 #include <stdlib.h>
 
