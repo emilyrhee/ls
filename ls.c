@@ -10,14 +10,7 @@ struct Option {
 };
 
 void print_dir(DIR* dir_ptr) {
-    struct dirent* dirent_ptr;
 
-    dirent_ptr = readdir(dir_ptr);
-
-    while (dirent_ptr != 0) {
-        printf("%s\n", dirent_ptr->d_name);
-        dirent_ptr = readdir(dir_ptr);
-    }
 }
 
 void do_ls(char* dir_name, struct Option option) {
@@ -26,11 +19,19 @@ void do_ls(char* dir_name, struct Option option) {
     if (dir_ptr == 0) {
         perror(dir_name);
     } else {
-        print_dir(dir_ptr);
+        struct dirent* dirent_ptr;
+        dirent_ptr = readdir(dir_ptr);
+
+        while (dirent_ptr != 0) {
+            if (option.a || dirent_ptr->d_name[0] != '.') {
+                printf("%s\n", dirent_ptr->d_name);
+            }
+
+            dirent_ptr = readdir(dir_ptr);
+        }
         closedir(dir_ptr);
     }
 }
-
 
 void parse_options(
     int argc,
