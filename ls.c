@@ -20,6 +20,13 @@ int cmpstr(void const *a, void const *b) {
     return strcmp(aa, bb);
 }
 
+int cmpstr_reverse(void const *a, void const *b) { 
+    char const *aa = (char const *)a;
+    char const *bb = (char const *)b;
+
+    return strcmp(bb, aa);
+}
+
 void do_ls(char* dir_name, struct Option option) {
     DIR* dir_ptr = opendir(dir_name);
     char dir_ents[MAX_DIR_ENTS][MAX_NAME_LENGTH];
@@ -46,14 +53,17 @@ void do_ls(char* dir_name, struct Option option) {
 
             dirent_ptr = readdir(dir_ptr);
         }
+        
         closedir(dir_ptr);
 
         if (option.s)
-            qsort(dir_ents, current_ent, sizeof(dir_ents[0]), cmpstr);
+            qsort(dir_ents, current_ent, MAX_NAME_LENGTH, cmpstr);
 
-        for (int i = 0; i < current_ent; i++) {
+        if (option.r)
+            qsort(dir_ents, current_ent, MAX_NAME_LENGTH, cmpstr_reverse);
+
+        for (int i = 0; i < current_ent; i++)
             printf("%s\n", dir_ents[i]);
-        }
     }
 }
 
